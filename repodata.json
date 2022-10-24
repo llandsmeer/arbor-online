@@ -1,0 +1,60 @@
+{
+    "info": {
+        "arch": "wasm32",
+        "platform": "emscripten_3_1_21",
+        "version": "0.22.0a1",
+        "python": "3.10.2"
+    },
+    "packages": {
+        "numpy": {
+            "name": "numpy",
+            "version": "1.23.0",
+            "file_name": "numpy-1.22.4-cp310-cp310-emscripten_3_1_21_wasm32.whl",
+            "install_dir": "site",
+            "sha256": "121c2417cdfd3d4518b7368430bb56daf2bcc9e23319be445415ae4b55a42a29",
+            "depends": [],
+            "imports": [
+                "numpy"
+            ],
+            "unvendored_tests": true
+        },
+        "micropip": {
+            "name": "micropip",
+            "version": "0.1.0",
+            "file_name": "micropip-0.1.0-py3-none-any.whl",
+            "install_dir": "site",
+            "sha256": "d67b5713c1dc5ba29c320d25bcf8ecb69585e92af62c9dfbef0a9c645d04679b",
+            "depends": [
+                "pyparsing",
+                "packaging"
+            ],
+            "imports": [
+                "micropip"
+            ]
+        },
+        "pyparsing": {
+            "name": "pyparsing",
+            "version": "3.0.9",
+            "file_name": "pyparsing-3.0.9-py3-none-any.whl",
+            "install_dir": "site",
+            "sha256": "369f74bc08ac5beb45602fbb0d833d25b1fa596509c589d29d0e639e71c88301",
+            "depends": [],
+            "imports": [
+                "pyparsing"
+            ]
+        },
+        "packaging": {
+            "name": "packaging",
+            "version": "21.3",
+            "file_name": "packaging-21.3-py3-none-any.whl",
+            "install_dir": "site",
+            "sha256": "861f7c4ee3cbd7a27f726e1d60fc05c96b45a4ddf1cfce23b50a142baa6dc749",
+            "depends": [
+                "pyparsing"
+            ],
+            "imports": [
+                "packaging"
+            ]
+        }
+    }
+}
