@@ -1,30 +1,76 @@
 #textarea-src {
     width: 100%;
     height: 100%;
-    /* resize: none; */
+    resize: none;
     font-family: monospace;
+    border: none;
+    margin: 0;
+    padding: 1em;
 }
 
 #console {
-    height: 500px;
+    overflow-wrap: break-word;
+    margin: 1em;
 }
 
-#console-card, #textarea-src {
+#console-scroll {
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 100%;
+}
+
+#textarea-src, #console-scroll {
     color: #ddd;
     background-color: #333;
 }
 
 html {
-  height: 100%;
-}
-body {
-  min-height: 100%;
-}
-
-#main {
-    height: 80vh;
-}
-
-#main > .row {
     height: 100%;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+}
+
+#run-btn {
+    height: 52px;
+    margin: 4px;
+    background-color: #00ff7f;
+    border: solid 1px #666;
+    border-radius: 6px;
+    float: right;
+    font-size: 30px;
+}
+
+.parent {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 60px repeat(2, 1fr) 60px;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    height: 100%;
+}
+
+.parent > div {
+    overflow: hidden;
+}
+
+.navbar {
+    grid-area: 1 / 1 / 2 / 3;
+    background-color: #d86310;
+}
+.left {
+    grid-area: 2 / 1 / 4 / 2;
+}
+.rtop {
+    grid-area: 2 / 2 / 3 / 3;
+}
+.rbot {
+    grid-area: 3 / 2 / 4 / 3;
+}
+.footer {
+    grid-area: 4 / 1 / 5 / 3;
+    background-color: #d86310;
 }

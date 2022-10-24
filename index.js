@@ -115,8 +115,10 @@ async function main() {
     await pyodide.loadPackage('numpy')
     await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
 
-    run_btn.onclick = () => {
-        pyodide.runPython(py_src.value)
+    run_btn.onclick = async () => {
+        console.innerText = ''
+        await pyodide.runPython(py_src.value)
+        console.scrollTop = console.scrollHeight;
     }
 
 
