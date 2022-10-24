@@ -1,0 +1,30 @@
+#textarea-src {
+    width: 100%;
+    height: 100%;
+    /* resize: none; */
+    font-family: monospace;
+}
+
+#console {
+    height: 500px;
+}
+
+#console-card, #textarea-src {
+    color: #ddd;
+    background-color: #333;
+}
+
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+}
+
+#main {
+    height: 80vh;
+}
+
+#main > .row {
+    height: 100%;
+}
