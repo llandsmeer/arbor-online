@@ -1,6 +1,7 @@
 py_script = `
 import json
 import arbor
+import plotting
 
 print(json.dumps(arbor.config(), indent=1))
 
@@ -91,17 +92,17 @@ else:
 t = data[:, 0]
 v = data[:, 1]
 
-for x, y in zip(t, v):
-   print(f'{x:10.3f}, {y:10.3f}')
+plotting.plot(t, v)
 `
-
-
 
 async function main() {
     let py_src = document.getElementById('textarea-src')
     py_src.value = py_script.replace('\n', '\r\n')
     let console = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
+    let plot_canvas = document.getElementById('plot-canvas')
+    let ctx = plot_canvas.getContext('2d')
+    console.innerText += 'Loading...\n'
     let pyodide = await loadPyodide({
         stdout: (msg) => {
             console.innerText += msg + '\n'
@@ -110,17 +111,74 @@ async function main() {
             console.innerText += msg + '\n'
         },
     })
+    function buffer_to_array(b, normalize=false) {
+        let x = []
+        for (let i = 0; i < b.shape[0]; i++) {
+            x.push(b.data[b.offset + i*b.strides[0]]);
+        }
+        if (normalize) {
+            let xmin = +1e100
+            let xmax = -1e100
+            for (let i = 0; i < x.length; i++) {
+                // avoid nan
+                if (x[i] > xmax) xmax = x[i]
+                if (x[i] < xmin) xmin = x[i]
+            }
+            for (let i = 0; i < x.length; i++) {
+                if (x[i] == x[i]) {
+                    x[i] = (x[i] - xmin) / (xmax - xmin)
+                } else {
+                    x[i] = (xmin + xmax) / 2
+                }
+            }
+        }
+        return x
+    }
+    function plot_norm(x, y) {
+        plot_canvas.width = plot_canvas.clientWidth
+        plot_canvas.height = plot_canvas.clientHeight
+        ctx.clearRect(0, 0, plot_canvas.width, plot_canvas.height);
+        ctx.beginPath();
+        ctx.moveTo(x[0]*plot_canvas.width, y[0]*plot_canvas.height);
+        for (let i = 1; i < x.length; i++) {
+            ctx.lineTo(x[i]*plot_canvas.width, (1 - y[i])*plot_canvas.height);
+        }
+        ctx.stroke();
+    }
+    let plot_module = {
+        plot: function (x, y) {
+            let xx = buffer_to_array(x.getBuffer(), true)
+            let yy = buffer_to_array(y.getBuffer(), true)
+            plot_norm(xx, yy)
+        }
+    };
+    pyodide.registerJsModule("plotting", plot_module);
     py = pyodide
     await pyodide.loadPackage('micropip')
     await pyodide.loadPackage('numpy')
     await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
 
-    run_btn.onclick = async () => {
+    async function run_code() {
         console.innerText = ''
         await pyodide.runPython(py_src.value)
         console.scrollTop = console.scrollHeight;
     }
 
+    py_src.key_down = (e) => {
+        if (e.keyCode == 13) {
+            if (e.ctrlKey) {
+                run_code()
+                e.preventDefault()
+                return true;
+            }
+        }
+        return false
+    }
+    run_btn.onclick = async () => {
+        await run_code();
+    }
+
+    console.innerText += 'Ready!\n'
 
 };
 main();

@@ -44,6 +44,13 @@ body {
     font-size: 30px;
 }
 
+#plot-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+
 .parent {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
