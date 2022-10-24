@@ -34,6 +34,13 @@ body {
     height: 100%;
 }
 
+#brand {
+    height: 100%;
+    padding: 4px;
+    background-color: white;
+    display: inline-block;
+}
+
 #run-btn {
     height: 52px;
     margin: 4px;
