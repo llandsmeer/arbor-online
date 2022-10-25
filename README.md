@@ -20,7 +20,7 @@ The build process is very version dependent, you'll probably have to adapt it to
  1) Download and unpack a [pyodide release](https://github.com/pyodide/pyodide/releases), both the `xbuildenv-*.tar.bz2` and `pyodide-*.tar.bz2` files.
  2) Find out the emscripten version, eg. by running `make -f Makefile.envs .output_vars | grep PYODIDE_EMSCRIPTEN_VERSION` in `xbuildenv-*/pyodide-root`
  3) Download the latest [emsdk release](https://emscripten.org/docs/tools_reference/emsdk.html)
- 4) Install the correct (same as pyodide) emscripten version using emsdk install/activate and the new paths to you environment
+ 4) Install the correct (same as pyodide) emscripten version using emsdk install/activate and the new paths to you environment. If you don't do this you'll get an infinite stream of annoying type errors.
  5) Download/git clone the arbor repository
  6) Build a regular (native) modcc binary
      - `mkdir build; cd build`
@@ -29,12 +29,13 @@ The build process is very version dependent, you'll probably have to adapt it to
      - `make install`
  7) Build emscripten arbor libraries (without python or neuroml support) and using the modcc previously built to generate the C++ mechanism files.
     Now currently this doesn't work because of a bug in the CMakeLists.txt, you need to manually disable building modcc and update the modcc variable to point to your previously built modcc binary there. Also there is a error in the Random123 library that you need to remove from the source code in the gcc-intrinsics file.
+    We use `ARB_ARCH=generic` because the default `native`
     - `mkdir build-emscripten; cd build-emscripten`
     - `source "path/to/emsdk_env.sh"`
-    - `cmake .. --toolchain /usr/share/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_INSTALL_PREFIX=$(realpath prefix) -DARB_USE_BUNDLED_LIBS=ON -DARB_MODCC=../build/prefix/bin/modcc -DARB_ARCH=generic`
+    - `cmake .. --toolchain path/to/the/emsdk/Emscripten.cmake -DCMAKE_INSTALL_PREFIX=$(realpath prefix) -DARB_USE_BUNDLED_LIBS=ON -DARB_MODCC=../build/prefix/bin/modcc -DARB_ARCH=generic`
     - `make -j10`
     - `make install`
- 8) Build the python .so file
+ 8) Build the python .so file. The standard pyodide-build method doesn't work
     - `mkdir build-empy; cd build-empy`
     - `source "path/to/emsdk_env.sh"`
     - (See em++ invocation below)
