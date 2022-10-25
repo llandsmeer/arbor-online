@@ -14,7 +14,8 @@ Live version (v0.1 beta): https://llandsmeer.github.io/arbor-online/
 
 ## Build instructions
 
-For if you want to port a new arbor version
+For if you want to port a new arbor version.
+The build process is very version dependent, you'll probably have to adapt it to new releases.
 
  1) Download and unpack a [pyodide release](https://github.com/pyodide/pyodide/releases), both the `xbuildenv-*.tar.bz2` and `pyodide-*.tar.bz2` files.
  2) Find out the emscripten version, eg. by running `make -f Makefile.envs .output_vars | grep PYODIDE_EMSCRIPTEN_VERSION` in `xbuildenv-*/pyodide-root`
@@ -27,7 +28,7 @@ For if you want to port a new arbor version
      - `make modcc`
      - `make install`
  7) Build emscripten arbor libraries (without python or neuroml support) and using the modcc previously built to generate the C++ mechanism files.
-    Now currently this doesn't work because of a bug in the CMakeLists.txt, you need to manually disable building modcc and update the modcc variable to point to your previously built modcc binary there.
+    Now currently this doesn't work because of a bug in the CMakeLists.txt, you need to manually disable building modcc and update the modcc variable to point to your previously built modcc binary there. Also there is a error in the Random123 library that you need to remove from the source code in the gcc-intrinsics file.
     - `mkdir build-emscripten; cd build-emscripten`
     - `source "path/to/emsdk_env.sh"`
     - `cmake .. --toolchain /usr/share/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_INSTALL_PREFIX=$(realpath prefix) -DARB_USE_BUNDLED_LIBS=ON -DARB_MODCC=../build/prefix/bin/modcc -DARB_ARCH=generic`
