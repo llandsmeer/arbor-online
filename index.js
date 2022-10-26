@@ -1,7 +1,6 @@
 py_script = `
 import arbor
 import plotting
-import plotly.express as px
 
 tree = arbor.segment_tree()
 tree.append(arbor.mnpos, arbor.mpoint(-3, 0, 0, 3), arbor.mpoint(3, 0, 0, 3), tag=1)
@@ -124,6 +123,7 @@ async function main() {
     py = pyodide
     await pyodide.loadPackage('micropip')
     await pyodide.loadPackage('numpy')
+    await pyodide.loadPackage('pandas')
     await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
 
     async function run_code() {
