@@ -1,8 +1,13 @@
 const MODELS = [
     {
+        title: 'Single cell model',
+        url: 'models/single_cell_model.py',
+        description: 'Single Hodgkin-Huxley cell'
+    },
+    {
         title: 'Single cell recipe',
         url: 'models/single_cell_recipe.py',
-        description: 'Single hodgkin-huxley cell recipe example'
+        description: 'Single Hodgkin-Huxley cell (via recipe)'
     },
     {
         title: 'Diffusion',
@@ -23,6 +28,16 @@ const MODELS = [
         title: 'Brunel',
         url: 'models/brunel.py',
         description: 'Advanced network example containing excitatory and inhibitory LIF cells.'
+    },
+    {
+        title: 'Plasticity',
+        url: 'models/plasticity.py',
+        description: 'TBH I don\'t understand how this demonstrates plasticity'
+    },
+    {
+        title: 'Spike-timing-dependent plasticity',
+        url: 'models/single_cell_stdp.py',
+        description: 'STDP example using a single cell and explicit spike generators'
     },
 ]
 
