@@ -1,6 +1,7 @@
 py_script = `
 import arbor
-import plotting
+import plotly.express as px
+import arbor_playground
 
 tree = arbor.segment_tree()
 tree.append(arbor.mnpos, arbor.mpoint(-3, 0, 0, 3), arbor.mpoint(3, 0, 0, 3), tag=1)
@@ -37,7 +38,6 @@ class single_recipe(arbor.recipe):
     def global_properties(self, kind):
         return self.the_props
 
-
 recipe = single_recipe()
 
 sim = arbor.simulation(recipe)
@@ -59,7 +59,14 @@ else:
 t = data[:, 0]
 v = data[:, 1]
 
-plotting.plot(t, v)
+fig = px.line(x=t, y=v)
+fig_html = fig.to_html(
+    include_plotlyjs=False,
+    full_html=False,
+    default_height='100%'
+)
+
+arbor_playground.render_html(fig_html)
 `
 
 async function main() {
@@ -67,71 +74,60 @@ async function main() {
     py_src.value = py_script.replace('\n', '\r\n')
     let console = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
-    let plot_canvas = document.getElementById('plot-canvas')
-    let ctx = plot_canvas.getContext('2d')
-    console.innerText += 'Loading...\n'
+    function message_ok(msg) {
+        console.innerText += msg + '\n'
+    }
+    function message_err(msg) {
+        message_ok(msg)
+    }
+    message_ok('Loading...')
     let pyodide = await loadPyodide({
         stdout: (msg) => {
-            console.innerText += msg + '\n'
+            message_ok(msg)
         },
         stderr: (msg) => {
-            console.innerText += msg + '\n'
+            message_err(msg)
         },
     })
-    function buffer_to_array(b, normalize=false) {
-        let x = []
-        for (let i = 0; i < b.shape[0]; i++) {
-            x.push(b.data[b.offset + i*b.strides[0]]);
-        }
-        if (normalize) {
-            let xmin = +1e100
-            let xmax = -1e100
-            for (let i = 0; i < x.length; i++) {
-                // avoid nan
-                if (x[i] > xmax) xmax = x[i]
-                if (x[i] < xmin) xmin = x[i]
-            }
-            for (let i = 0; i < x.length; i++) {
-                if (x[i] == x[i]) {
-                    x[i] = (x[i] - xmin) / (xmax - xmin)
-                } else {
-                    x[i] = (xmin + xmax) / 2
-                }
-            }
-        }
-        return x
-    }
-    function plot_norm(x, y) {
-        plot_canvas.width = plot_canvas.clientWidth
-        plot_canvas.height = plot_canvas.clientHeight
-        ctx.clearRect(0, 0, plot_canvas.width, plot_canvas.height);
-        ctx.beginPath();
-        ctx.moveTo(x[0]*plot_canvas.width, y[0]*plot_canvas.height);
-        for (let i = 1; i < x.length; i++) {
-            ctx.lineTo(x[i]*plot_canvas.width, (1 - y[i])*plot_canvas.height);
-        }
-        ctx.stroke();
-    }
-    let plot_module = {
-        plot: function (x, y) {
-            let xx = buffer_to_array(x.getBuffer(), true)
-            let yy = buffer_to_array(y.getBuffer(), true)
-            plot_norm(xx, yy)
-        }
-    };
-    pyodide.registerJsModule("plotting", plot_module);
     py = pyodide
     await pyodide.loadPackage('micropip')
+    message_ok('Loaded micropip')
     await pyodide.loadPackage('numpy')
+    message_ok('Loaded numpy')
     await pyodide.loadPackage('pandas')
+    message_ok('Loaded pandas')
     await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
+    message_ok('Loaded arbor')
+    await pyodide.runPythonAsync(`
+        import micropip
+        await micropip.install('plotly==5.0.0')
+    `)
+    message_ok('Installed plotly!')
+    function render_html_output(html) {
+        var range = document.createRange();
+        let container = document.getElementById('render-html-output')
+        range.selectNode(container);
+        var documentFragment = range.createContextualFragment(html);
+        while (container.hasChildNodes()) {  
+            container.removeChild(container.firstChild);
+        }
+        container.appendChild(documentFragment);
+        container.className = "plotly";
+    }
+    let plot_module = {
+        render_html(html) {
+            render_html_output(html)
+        }
+    }
+    pyodide.registerJsModule('arbor_playground', plot_module)
+    message_ok('Registered html render module')
 
     async function run_code() {
         console.innerText = ''
         try {
             await pyodide.runPython(py_src.value)
         } catch (error) {
-            console.innerText += '\n' + error + '\n'
+            message_err(error)
         }
         console.scrollTop = console.scrollHeight;
     }
@@ -150,7 +146,8 @@ async function main() {
         await run_code();
     }
 
-    console.innerText += 'Ready!\n'
+    message_ok('Ready!')
+    run_btn.classList.add("ready");
 
 };
 main();

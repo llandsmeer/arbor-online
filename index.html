@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://cdn.plot.ly/plotly-2.1.0.min.js"></script>
         <script src="./pyodide.js"></script>
         <link href="index.css" rel="stylesheet">
     </head>
@@ -12,7 +13,7 @@
             <div class="navbar">
                 <div id="brand">
                     <img src="https://docs.arbor-sim.org/en/latest/_static/arbor-lines-proto-colour.svg"></img></div>
-                <button type="button" id="run-btn" class="btn btn-success">Run model</button>
+                    <button type="button" id="run-btn">Run model</button>
             </div>
             <div class="left">
                 <textarea id="textarea-src" class="form-control col-xs-12" height="auto"></textarea>
@@ -23,7 +24,7 @@
                 </div>
             </div>
             <div class="rbot">
-                <canvas id="plot-canvas"></canvas>
+                <div id="render-html-output"></div>
             </div>
             <div class="footer">
             </div>
