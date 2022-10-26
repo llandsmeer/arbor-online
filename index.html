@@ -4,7 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://cdn.plot.ly/plotly-2.1.0.min.js"></script>
-        <script src="./pyodide.js"></script>
+        <script src="/pyodide.js"></script>
+        <script src="/ace-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
         <link href="index.css" rel="stylesheet">
     </head>
     <body>
@@ -16,7 +17,7 @@
                     <button type="button" id="run-btn">Run model</button>
             </div>
             <div class="left">
-                <textarea id="textarea-src" class="form-control col-xs-12" height="auto"></textarea>
+                <div id="editor"></div>
             </div>
             <div class="rtop">
                 <div id="console-scroll">

@@ -1,13 +1,3 @@
-#textarea-src {
-    width: 100%;
-    height: 100%;
-    resize: none;
-    font-family: monospace;
-    border: none;
-    margin: 0;
-    padding: 1em;
-}
-
 #console {
     overflow-wrap: break-word;
     margin: 1em;
@@ -20,9 +10,15 @@
     height: 100%;
 }
 
-#textarea-src, #console-scroll {
+#console-scroll {
     color: #ddd;
     background-color: #333;
+}
+
+#editor {
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
 }
 
 html {

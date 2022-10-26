@@ -70,8 +70,6 @@ arbor_playground.render_html(fig_html)
 `
 
 async function main() {
-    let py_src = document.getElementById('textarea-src')
-    py_src.value = py_script.replace('\n', '\r\n')
     let console = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
     function message_ok(msg) {
@@ -89,7 +87,7 @@ async function main() {
             message_err(msg)
         },
     })
-    py = pyodide
+    py = pyodide // global export for debugging
     await pyodide.loadPackage('micropip')
     message_ok('Loaded micropip')
     await pyodide.loadPackage('numpy')
@@ -124,7 +122,7 @@ async function main() {
     async function run_code(code=null) {
         if (code == null) console.innerText = ''
         try {
-            await pyodide.runPython(code == null ? py_src.value : code)
+            await pyodide.runPython(code == null ? editor.getValue() : code)
         } catch (error) {
             message_err(error)
         }
@@ -135,6 +133,13 @@ async function main() {
 
     message_ok('Cached pandas, arbor, plotly')
 
+    var editor = ace.edit('editor')
+    editor.setTheme('ace/theme/monokai')
+    editor.session.setMode('ace/mode/python')
+    editor.session.setValue(py_script)
+    message_ok('Set up editor')
+
+    /*
     py_src.key_down = (e) => {
         if (e.keyCode == 13) {
             if (e.ctrlKey) {
@@ -145,6 +150,7 @@ async function main() {
         }
         return false
     }
+    */
     run_btn.onclick = async () => {
         await run_code();
     }
