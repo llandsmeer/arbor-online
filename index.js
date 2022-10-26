@@ -120,13 +120,19 @@ async function main() {
     message_ok('Registered html render module')
 
     async function run_code(code=null) {
-        if (code == null) console.innerText = ''
+        if (code == null) {
+            console.innerText = ''
+            run_btn.classList.remove("ready");
+        }
         try {
             await pyodide.runPython(code == null ? editor.getValue() : code)
         } catch (error) {
             message_err(error)
         }
         console.scrollTop = console.scrollHeight;
+        if (code == null) {
+            run_btn.classList.add("ready");
+        }
     }
 
     run_code('import pandas, arbor, plotly, numpy')
