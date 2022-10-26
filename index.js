@@ -1,77 +1,31 @@
-py_script = `
-import arbor
-import plotly.express as px
-import arbor_playground
-
-tree = arbor.segment_tree()
-tree.append(arbor.mnpos, arbor.mpoint(-3, 0, 0, 3), arbor.mpoint(3, 0, 0, 3), tag=1)
-
-labels = arbor.label_dict({"soma": "(tag 1)", "midpoint": "(location 0 0.5)"})
-
-decor = (
-    arbor.decor()
-    .set_property(Vm=-40)
-    .paint('"soma"', arbor.density("hh"))
-    .place('"midpoint"', arbor.iclamp(10, 2, 0.8), "iclamp")
-    .place('"midpoint"', arbor.threshold_detector(-10), "detector")
-)
-
-cell = arbor.cable_cell(tree, decor, labels)
-
-class single_recipe(arbor.recipe):
-    def __init__(self):
-        arbor.recipe.__init__(self)
-        self.the_props = arbor.neuron_cable_properties()
-
-    def num_cells(self):
-        return 1
-
-    def cell_kind(self, gid):
-        return arbor.cell_kind.cable
-
-    def cell_description(self, gid):
-        return cell
-
-    def probes(self, gid):
-        return [arbor.cable_probe_membrane_voltage('"midpoint"')]
-
-    def global_properties(self, kind):
-        return self.the_props
-
-recipe = single_recipe()
-
-sim = arbor.simulation(recipe)
-
-sim.record(arbor.spike_recording.all)
-handle = sim.sample((0, 0), arbor.regular_schedule(0.1))
-sim.run(tfinal=30)
-
-spikes = sim.spikes()
-data, meta = sim.samples(handle)[0]
-
-if len(spikes) > 0:
-    print("{} spikes:".format(len(spikes)))
-    for t in spikes["time"]:
-        print("{:3.3f}".format(t))
-else:
-    print("no spikes")
-
-t = data[:, 0]
-v = data[:, 1]
-
-fig = px.line(x=t, y=v)
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
-
-arbor_playground.render_html(fig_html)
-`
+const MODELS = [
+    {
+        title: 'Single cell recipe',
+        url: 'models/single_cell_recipe.py',
+        description: 'Single cell recipe example'
+    },
+    {
+        title: 'Diffusion',
+        url: 'models/diffusion.py',
+        description: 'Diffusion example'
+    },
+    {
+        title: 'Gap junctions',
+        url: 'models/gap_junctions.py',
+        description: 'Gap junctions example'
+    },
+    {
+        title: 'Network ring',
+        url: 'models/network_ring.py',
+        description: 'Network ring example'
+    },
+]
 
 async function main() {
     let console = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
+    let welcome_btn = document.getElementById('welcome-btn')
+    let current_modal = null
     function quote(text) {
         return (''+text).replaceAll('&', '&amp;')
             .replaceAll('<', '&lt;')
@@ -85,6 +39,53 @@ async function main() {
     function message_err(msg) {
         console.innerHTML += '<span class="error">' + quote(msg) + '</span>\n'
     }
+    /* START MODAL CODE */
+    document.querySelectorAll('.modal-close').forEach(e => {
+        e.onclick = function() {
+            if (current_modal != null) {
+                current_modal.style.display = 'none';
+                current_modal = null
+            }
+        }
+    })
+    function show_modal(id) {
+        let m = document.getElementById(id)
+        current_modal = m
+        m.style.display = 'block'
+    }
+    window.onclick = function(event) {
+        if (event.target == current_modal) {
+            current_modal.style.display = 'none';
+        }
+    }
+    show_modal('welcome-modal')
+    welcome_btn.onclick = () => {
+        show_modal('welcome-modal')
+    }
+    let container = document.getElementById('available-models')
+    MODELS.forEach((model, i) => {
+        container.innerHTML += `
+            <div class="loadable-model" data-model-idx="${i}">
+                <h3>${quote(model.title)}</h3>
+                <p>${quote(model.description)}</p>
+            </div>
+        `
+    })
+    async function load_model(model) {
+        let res = await fetch(model.url)
+        editor.session.setValue(await res.text())
+        await run_code()
+    }
+    document.querySelectorAll('.loadable-model').forEach(target => {
+        target.onclick = async () => {
+            let idx = target.getAttribute('data-model-idx')
+            let model = MODELS[idx]
+            await load_model(model)
+            current_modal.style.display = 'none';
+        }
+    })
+
+    /* END MODAL CODE */
     message_ok('Loading...')
     let pyodide = await loadPyodide({
         stdout: (msg) => {
@@ -166,27 +167,18 @@ async function main() {
     var editor = ace.edit('editor')
     editor.setTheme('ace/theme/monokai')
     editor.session.setMode('ace/mode/python')
-    editor.session.setValue(py_script)
     message_ok('Set up editor')
 
-    /*
-    py_src.key_down = (e) => {
-        if (e.keyCode == 13) {
-            if (e.ctrlKey) {
-                run_code()
-                e.preventDefault()
-                return true;
-            }
-        }
-        return false
-    }
-    */
     run_btn.onclick = async () => {
         await run_code();
     }
 
+    await load_model(MODELS[0])
+
     message_ok('Ready!')
     run_btn.classList.add("ready");
 
+
 };
+
 main();
