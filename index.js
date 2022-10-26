@@ -98,11 +98,10 @@ async function main() {
     message_ok('Loaded pandas')
     await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
     message_ok('Loaded arbor')
-    await pyodide.runPythonAsync(`
-        import micropip
-        await micropip.install('plotly==5.0.0')
-    `)
-    message_ok('Installed plotly!')
+    await pyodide.loadPackage('tenacity-8.1.0-py3-none-any.whl')
+    message_ok('Loaded tenacity')
+    await pyodide.loadPackage('plotly-5.0.0-py2.py3-none-any.whl')
+    message_ok('Loaded plotly')
     function render_html_output(html) {
         var range = document.createRange();
         let container = document.getElementById('render-html-output')
@@ -122,15 +121,19 @@ async function main() {
     pyodide.registerJsModule('arbor_playground', plot_module)
     message_ok('Registered html render module')
 
-    async function run_code() {
-        console.innerText = ''
+    async function run_code(code=null) {
+        if (code == null) console.innerText = ''
         try {
-            await pyodide.runPython(py_src.value)
+            await pyodide.runPython(code == null ? py_src.value : code)
         } catch (error) {
             message_err(error)
         }
         console.scrollTop = console.scrollHeight;
     }
+
+    run_code('import pandas, arbor, plotly, numpy')
+
+    message_ok('Cached pandas, arbor, plotly')
 
     py_src.key_down = (e) => {
         if (e.keyCode == 13) {
