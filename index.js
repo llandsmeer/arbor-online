@@ -144,6 +144,7 @@ async function main() {
     async function run_code(code=null) {
         if (code == null) {
             console.innerText = ''
+            render_html_output('')
             run_btn.classList.remove("ready");
             message_ok('Console output [' + (new Date()).toISOString() + ']')
         }
