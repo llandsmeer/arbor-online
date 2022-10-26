@@ -2,22 +2,27 @@ const MODELS = [
     {
         title: 'Single cell recipe',
         url: 'models/single_cell_recipe.py',
-        description: 'Single cell recipe example'
+        description: 'Single hodgkin-huxley cell recipe example'
     },
     {
         title: 'Diffusion',
         url: 'models/diffusion.py',
-        description: 'Diffusion example'
+        description: 'Minimal example showcasing sodium diffusion through cell compartments.'
     },
     {
         title: 'Gap junctions',
         url: 'models/gap_junctions.py',
-        description: 'Gap junctions example'
+        description: 'Minimal example of multicompartmental cells connected via gap junctions and synapses.'
     },
     {
         title: 'Network ring',
         url: 'models/network_ring.py',
-        description: 'Network ring example'
+        description: 'Minimal example of a network in Arbor. Four cells connected with delayed synapses leads to a persistent traveling wave in the network.'
+    },
+    {
+        title: 'Brunel',
+        url: 'models/brunel.py',
+        description: 'Advanced network example containing excitatory and inhibitory LIF cells.'
     },
 ]
 
