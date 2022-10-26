@@ -1,6 +1,7 @@
 py_script = `
 import arbor
 import plotting
+import plotly.express as px
 
 tree = arbor.segment_tree()
 tree.append(arbor.mnpos, arbor.mpoint(-3, 0, 0, 3), arbor.mpoint(3, 0, 0, 3), tag=1)
@@ -127,7 +128,11 @@ async function main() {
 
     async function run_code() {
         console.innerText = ''
-        await pyodide.runPython(py_src.value)
+        try {
+            await pyodide.runPython(py_src.value)
+        } catch (error) {
+            console.innerText += '\n' + error + '\n'
+        }
         console.scrollTop = console.scrollHeight;
     }
 
