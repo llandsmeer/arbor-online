@@ -13,12 +13,13 @@
 #console-scroll {
     color: #ddd;
     background-color: #333;
+    font-size: 12pt;
 }
 
 #editor {
     width: 100%;
     height: 100%;
-    font-size: 12px;
+    font-size: 12pt;
 }
 
 html {
