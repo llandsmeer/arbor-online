@@ -72,11 +72,18 @@ arbor_playground.render_html(fig_html)
 async function main() {
     let console = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
+    function quote(text) {
+        return (''+text).replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
     function message_ok(msg) {
-        console.innerText += msg + '\n'
+        console.innerHTML += quote(msg) + '\n'
     }
     function message_err(msg) {
-        message_ok(msg)
+        console.innerHTML += '<span class="error">' + quote(msg) + '</span>\n'
     }
     message_ok('Loading...')
     let pyodide = await loadPyodide({
@@ -138,6 +145,7 @@ async function main() {
         if (code == null) {
             console.innerText = ''
             run_btn.classList.remove("ready");
+            message_ok('Console output [' + (new Date()).toISOString() + ']')
         }
         try {
             await pyodide.runPython(code == null ? editor.getValue() : code)

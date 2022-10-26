@@ -16,6 +16,10 @@
     font-size: 12pt;
 }
 
+#console .error {
+    color: red;
+}
+
 #editor {
     width: 100%;
     height: 100%;
