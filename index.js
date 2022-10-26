@@ -88,18 +88,33 @@ async function main() {
         },
     })
     py = pyodide // global export for debugging
-    await pyodide.loadPackage('micropip')
-    message_ok('Loaded micropip')
-    await pyodide.loadPackage('numpy')
-    message_ok('Loaded numpy')
-    await pyodide.loadPackage('pandas')
-    message_ok('Loaded pandas')
-    await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
-    message_ok('Loaded arbor')
-    await pyodide.loadPackage('tenacity-8.1.0-py3-none-any.whl')
-    message_ok('Loaded tenacity')
-    await pyodide.loadPackage('plotly-5.0.0-py2.py3-none-any.whl')
-    message_ok('Loaded plotly')
+    await Promise.all([
+        (async () => {
+            await pyodide.loadPackage('micropip')
+            message_ok('Loaded micropip')
+        })(),
+        (async () => {
+            await pyodide.loadPackage('numpy')
+            message_ok('Loaded numpy')
+        })(),
+        (async () => {
+            await pyodide.loadPackage('pandas')
+            message_ok('Loaded pandas')
+        })(),
+        (async () => {
+            await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
+            message_ok('Loaded arbor')
+        })(),
+        (async () => {
+            await pyodide.loadPackage('tenacity-8.1.0-py3-none-any.whl')
+            message_ok('Loaded tenacity')
+        })(),
+        (async () => {
+            await pyodide.loadPackage('plotly-5.0.0-py2.py3-none-any.whl')
+            message_ok('Loaded plotly')
+        })(),
+    ])
+
     function render_html_output(html) {
         var range = document.createRange();
         let container = document.getElementById('render-html-output')
