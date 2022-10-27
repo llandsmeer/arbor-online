@@ -20,7 +20,7 @@ const MODELS = [
     {
         title: 'Gap junctions',
         url: 'models/gap_junctions.py',
-        description: 'Minimal example of multicompartmental cells connected via gap junctions and synapses.',
+        description: 'Minimal example of multicompartmental cells connected via electrically conducting gap junctions and time delay synapses.',
         enabled: true
     },
     {
@@ -44,17 +44,17 @@ const MODELS = [
     {
         title: 'Spike-timing-dependent plasticity',
         url: 'models/single_cell_stdp.py',
-        description: 'STDP example using a single cell and explicit spike generators',
+        description: 'STDP example using a single cell and explicit spike generators. Plots out weight change as a function of simulus distance over multiple simulations.',
         enabled: true
     },
     {
-        title: 'single_cell_detailed_recipe.py',
+        title: 'Single cell detailed recipe',
         url: 'models/single_cell_detailed_recipe.py',
-        description: 'SWC loading',
+        description: 'Advanced single cell example that loads the cell morphology from an external SWC file. This example is known to break on firefox.',
         filesystem: [
             {
-                path: 'single_cell_detailed_recipe.swc',
-                url: 'models/single_cell_detailed_recipe.swc'
+                path: 'single_cell_detailed.swc',
+                url: 'models/single_cell_detailed.swc'
             }
         ],
         enabled: false
@@ -139,8 +139,8 @@ async function main() {
     }
     let container = document.getElementById('available-models')
     MODELS.forEach((model, i) => {
-        const is_localhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-        if (!is_localhost && !model.enabled) { return }
+        // const is_localhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        // if (!is_localhost && !model.enabled) { return }
         container.innerHTML += `
             <div class="loadable-model" data-model-idx="${i}">
                 <h3>${quote(model.title)}</h3>
@@ -162,7 +162,9 @@ async function main() {
             }
         }
 
-        await run_code()
+        if (model.enabled) {
+            await run_code()
+        }
     }
     document.querySelectorAll('.loadable-model').forEach(target => {
         target.onclick = async () => {
@@ -176,6 +178,7 @@ async function main() {
 
     /* END MODAL CODE */
     message_ok('Loading...')
+    console.time('loadPyodide')
     let pyodide = await loadPyodide({
         stdout: (msg) => {
             message_ok(msg)
@@ -184,33 +187,17 @@ async function main() {
             message_err(msg)
         },
     })
+    console.timeEnd('loadPyodide')
     py = pyodide // global export for debugging
-    await Promise.all([
-        (async () => {
-            await pyodide.loadPackage('micropip')
-            message_ok('Loaded micropip')
-        })(),
-        (async () => {
-            await pyodide.loadPackage('numpy')
-            message_ok('Loaded numpy')
-        })(),
-        (async () => {
-            await pyodide.loadPackage('pandas')
-            message_ok('Loaded pandas')
-        })(),
-        (async () => {
-            await pyodide.loadPackage('arbor-0.7-py3-none-any.whl')
-            message_ok('Loaded arbor')
-        })(),
-        (async () => {
-            await pyodide.loadPackage('tenacity-8.1.0-py3-none-any.whl')
-            message_ok('Loaded tenacity')
-        })(),
-        (async () => {
-            await pyodide.loadPackage('plotly-5.0.0-py2.py3-none-any.whl')
-            message_ok('Loaded plotly')
-        })(),
-    ])
+    console.time('loadPackages')
+    await pyodide.loadPackage([
+        'micropip',
+        'numpy',
+        'pandas',
+        'arbor-0.7-py3-none-any.whl',
+        'tenacity-8.1.0-py3-none-any.whl',
+        'plotly-5.0.0-py2.py3-none-any.whl'])
+    console.timeEnd('loadPackages')
 
     function render_html_output(html) {
         var range = document.createRange();
@@ -228,35 +215,69 @@ async function main() {
             render_html_output(html)
         }
     }
+    console.time('registerJsModule')
     pyodide.registerJsModule('arbor_playground', plot_module)
     message_ok('Registered html render module')
+    console.timeEnd('registerJsModule')
 
     async function run_code(code=null) {
         if (code == null) {
+            console.time('run_code')
             console_output.innerText = ''
             render_html_output('')
             run_btn.classList.remove("ready");
             message_ok('Console output [' + (new Date()).toISOString() + ']')
         }
         try {
-            await pyodide.runPython(code == null ? editor.getValue() : code)
+            pyodide.globals.set('code_to_run',
+                code == null ? editor.getValue() : code);
+            await pyodide.runPython('exec(compile(code_to_run, "main.py", "exec"), {})')
         } catch (error) {
-            message_err(error)
+            let test = '' + error
+            console.log(test)
+            if (test.indexOf('PythonError') === -1) {
+                // probably internal pyodide error or CppError
+                // this means we can't use any of the pyodide functions anymore..
+                message_err(test)
+            } else {
+                const traceback = pyodide.pyimport('traceback')
+                const lines = traceback.format_exception(error)
+                let frames = []
+                for (let i = 0; i < lines.__len__(); i++) {
+                    frames.push(...(lines.get(i).split('\n')))
+                }
+                let filtered_frames = ['PythonError: Traceback (most recent call last)']
+                let skip = true
+                for (let i = 1; i < frames.length; i++) {
+                    if (frames[i].indexOf("main.py") !== -1) {
+                        skip = false
+                    }
+                    if (!skip) {
+                        filtered_frames.push(frames[i])
+                    }
+                }
+                message_err(filtered_frames.join('\n'))
+            }
         }
         console_output.scrollTop = console_output.scrollHeight;
         if (code == null) {
             run_btn.classList.add("ready");
+            console.timeEnd('run_code')
         }
     }
 
+    console.time('cache_imports')
     await run_code('import pandas, arbor, plotly, numpy')
+    console.timeEnd('cache_imports')
 
     message_ok('Cached pandas, arbor, plotly')
 
+    console.time('aceEditor')
     editor = ace.edit('editor')
     editor.setTheme('ace/theme/monokai')
     editor.session.setMode('ace/mode/python')
     message_ok('Set up editor')
+    console.timeEnd('aceEditor')
 
     message_ok('Ready!')
 

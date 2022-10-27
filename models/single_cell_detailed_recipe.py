@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
-# This script is included in documentation. Adapt line numbers if touched.
+# WARNING!!
+# This script breaks with an pyodide internal
+# error in firefox, runs fine in chrome
+# Therefore it doesn't automatically run on startup
 
 import arbor
 import pandas
@@ -10,7 +12,7 @@ import arbor_playground
 
 # (1) Read the morphology from an SWC file.
 
-filename = 'single_cell_detailed_recipe.swc'
+filename = 'single_cell_detailed.swc'
 morph = arbor.load_swc_arbor(filename)
 
 # (2) Create and populate the label dictionary.
@@ -144,4 +146,10 @@ for i in range(len(data)):
         )
     )
 df = pandas.concat(df_list, ignore_index=True)
-px.line(df, x="t/ms", y="U/mV", color="Location", col="Variable")
+fig = px.line(df, x="t/ms", y="U/mV", color="Location")
+fig_html = fig.to_html(
+    include_plotlyjs=False,
+    full_html=False,
+    default_height='100%'
+)
+arbor_playground.render_html(fig_html)
