@@ -71,17 +71,16 @@ function quote(text) {
 
 function add_resize_handler() {
     const grid_parent = document.getElementsByClassName('parent')[0]
-    const hresize = document.getElementsByClassName('hresize')[0]
     let is_dragging = false
     let on_start = (e) => {
-        if (e.target === hresize) {
+        if (e.target.className === 'hresize') {
             is_dragging = true
             e.preventDefault()
         }
     }
     let on_move = (e) => {
         if (!is_dragging) return;
-        let x = e.clientX
+        let x = e.changedTouches === undefined ? e.clientX : e.changedTouches[0].clientX
         let rect = grid_parent.getBoundingClientRect()
         let fraction = (x - rect.left) / (rect.width - 10);
         fraction = Math.min(Math.max(.05, fraction), .95)
@@ -96,13 +95,14 @@ function add_resize_handler() {
     document.addEventListener('mousedown', on_start);
     document.addEventListener('mousemove', on_move);
     document.addEventListener('mouseup', on_end)
-    document.addEventListener('touchstart', on_start);
-    document.addEventListener('touchmove', on_move);
-    document.addEventListener('touchend', on_end)
+    document.addEventListener('touchstart', on_start, { passive: false });
+    document.addEventListener('touchmove', on_move, { passive: false });
+    document.addEventListener('touchend', on_end, { passive: false })
 }
 
 async function main() {
     add_resize_handler();
+    return
     let editor = null
     let console_output = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
@@ -150,20 +150,24 @@ async function main() {
     })
     async function load_model(model) {
         if (editor == null) return
+        console_output.innerText = ''
+        render_html_output('')
         let res = await fetch(model.url)
         editor.session.setValue(await res.text())
         if (model.filesystem) {
             pyodide.FS.chdir('/home/pyodide')
             for (const {path, url} of model.filesystem) {
-                message_ok('loading ' + path)
                 let r = await fetch(url)
                 let data = await r.text()
                 pyodide.FS.writeFile(path, data, { encoding: "utf8" });
+                message_ok('Created file "' + path + '"')
             }
         }
 
         if (model.enabled) {
             await run_code()
+        } else {
+            message_ok('Note: script not automatically executed')
         }
     }
     document.querySelectorAll('.loadable-model').forEach(target => {
