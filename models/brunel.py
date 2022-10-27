@@ -162,9 +162,5 @@ df = pd.DataFrame(
     columns=['Cell', 'Time (ms)'])
 
 fig = px.scatter(df, x='Time (ms)', y='Cell', title='Spikes')
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
+fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)

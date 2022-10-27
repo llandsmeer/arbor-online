@@ -101,9 +101,5 @@ data = np.array([(dT, run(dT)) for dT in np.arange(-20, 20, 0.5)])
 df = pd.DataFrame({"t/ms": data[:, 0], "dw": data[:, 1]})
 print("Plotting results ...")
 fig = px.scatter(df, x='t/ms', y='dw')
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
+fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)

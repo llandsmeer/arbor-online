@@ -151,9 +151,5 @@ for i in range(len(data)):
     )
 df = pandas.concat(df_list, ignore_index=True)
 fig = px.line(df, x="t/ms", y="U/mV", color="Location")
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
+fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)

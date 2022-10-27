@@ -93,10 +93,5 @@ print("Plotting results ...")
 
 df = pandas.DataFrame({"t/ms": data[:, 0], "U/mV": data[:, 1]})
 fig = px.line(df, x='t/ms', y='U/mV')
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
-
+fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)

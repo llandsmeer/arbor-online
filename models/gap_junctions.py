@@ -161,9 +161,5 @@ for gid in range(ncells):
 
 df = pandas.concat(df_list, ignore_index=True)
 fig = px.line(df, x="t/ms", y="U/mV", color='Cell')
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
+fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)

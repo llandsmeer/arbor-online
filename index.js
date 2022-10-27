@@ -56,7 +56,7 @@ const MODELS = [
     {
         title: 'Modifying network topology',
         url: 'models/plasticity.py',
-        description: 'Example of modifying synaptic connections in a running simulation. Thihs is done via the simulation.update_connections(recipe) function, which re-reads the recipe\'s connections_on().',
+        description: 'Example of modifying synaptic connections in a running simulation. This is done via the simulation.update_connections(recipe) function, which re-reads the recipe\'s connections_on().',
         enabled: true
     },
 ]

@@ -80,9 +80,5 @@ fig = go.Figure(
         legend_title="Time (ms)",
     )
 )
-fig_html = fig.to_html(
-    include_plotlyjs=False,
-    full_html=False,
-    default_height='100%'
-)
+fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)
