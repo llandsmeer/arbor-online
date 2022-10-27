@@ -38,7 +38,7 @@ const MODELS = [
     {
         title: 'Plasticity',
         url: 'models/plasticity.py',
-        description: 'Example of modifying synaptic connections in a running simulation.',
+        description: 'Example of modifying synaptic connections in a running simulation. Thihs is done via the simulation.update_connections(recipe) function, which re-reads the recipe\'s connections_on().',
         enabled: true
     },
     {
@@ -61,13 +61,22 @@ const MODELS = [
     },
 ]
 
-async function add_resize_handler() {
+function quote(text) {
+    return (''+text).replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+function add_resize_handler() {
     const grid_parent = document.getElementsByClassName('parent')[0]
     const hresize = document.getElementsByClassName('hresize')[0]
     let is_dragging = false
     document.addEventListener('mousedown', function(e) {
         if (e.target === hresize) {
             is_dragging = true
+            e.preventDefault()
         }
     });
     document.addEventListener('mousemove', function(e) {
@@ -76,9 +85,10 @@ async function add_resize_handler() {
         let rect = grid_parent.getBoundingClientRect()
         let fraction = (x - rect.left) / (rect.width - 10);
         fraction = Math.min(Math.max(.1, fraction), .9)
-        const total = 100
+        const total = 1000
         fraction = Math.round(fraction * total)
         grid_parent.style.gridTemplateColumns = `${fraction}fr 10px ${total - fraction}fr`
+        e.preventDefault()
     });
     document.addEventListener('mouseup', function(e) {
         is_dragging = false
@@ -86,18 +96,12 @@ async function add_resize_handler() {
 }
 
 async function main() {
-    await add_resize_handler();
+    add_resize_handler();
+    let editor = null
     let console_output = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
     let welcome_btn = document.getElementById('welcome-btn')
     let current_modal = null
-    function quote(text) {
-        return (''+text).replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
-    }
     function message_ok(msg) {
         console_output.innerHTML += quote(msg) + '\n'
     }
@@ -139,6 +143,7 @@ async function main() {
         `
     })
     async function load_model(model) {
+        if (editor == null) return
         let res = await fetch(model.url)
         editor.session.setValue(await res.text())
         if (model.filesystem) {
@@ -155,6 +160,7 @@ async function main() {
     }
     document.querySelectorAll('.loadable-model').forEach(target => {
         target.onclick = async () => {
+            if (editor == null) return
             let idx = target.getAttribute('data-model-idx')
             let model = MODELS[idx]
             await load_model(model)
@@ -237,14 +243,16 @@ async function main() {
         }
     }
 
-    run_code('import pandas, arbor, plotly, numpy')
+    await run_code('import pandas, arbor, plotly, numpy')
 
     message_ok('Cached pandas, arbor, plotly')
 
-    var editor = ace.edit('editor')
+    editor = ace.edit('editor')
     editor.setTheme('ace/theme/monokai')
     editor.session.setMode('ace/mode/python')
     message_ok('Set up editor')
+
+    message_ok('Ready!')
 
     run_btn.onclick = async () => {
         await run_code();
@@ -252,7 +260,6 @@ async function main() {
 
     await load_model(MODELS[0])
 
-    message_ok('Ready!')
     run_btn.classList.add("ready");
 
 
