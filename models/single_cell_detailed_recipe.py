@@ -15,6 +15,10 @@ import arbor_playground
 filename = 'single_cell_detailed.swc'
 morph = arbor.load_swc_arbor(filename)
 
+print('SWC contents:')
+with open(filename) as f:
+    print(f.read())
+
 # (2) Create and populate the label dictionary.
 
 labels = arbor.label_dict(

@@ -1,44 +1,38 @@
 const MODELS = [
     {
-        title: 'Single cell model',
+        title: 'Single Hodgkin-Huxley cell (single_cell_model)',
         url: 'models/single_cell_model.py',
-        description: 'Single Hodgkin-Huxley cell',
+        description: 'The smallest possible useful Arbor example. A single Hodgkin-Huxley cell constructed via the simple arbor.single_cell_model API. The single_cell_model is not as powerful a full recipe construction, but is very convenient for if you\'re only simulating a single cell and only interested in recording voltages.',
         enabled: true
     },
     {
-        title: 'Single cell recipe',
+        title: 'Single Hodgkin-Huxley cell (recipe)',
         url: 'models/single_cell_recipe.py',
-        description: 'Single Hodgkin-Huxley cell (via recipe)',
+        description: 'Single Hodgkin-Huxley cell via the recipe API, which allows for more complicated network construction.',
         enabled: true
     },
     {
-        title: 'Diffusion',
-        url: 'models/diffusion.py',
-        description: 'Minimal example showcasing sodium diffusion through cell compartments.',
-        enabled: true
+        title: 'Single cell detailed recipe (SWC morphology)',
+        url: 'models/single_cell_detailed_recipe.py',
+        description: 'Advanced single cell example that loads the cell morphology from an external SWC file. Sodium concentration reversal potential is calculated using the Nernst equations. This example is known to break on firefox.',
+        filesystem: [
+            {
+                path: 'single_cell_detailed.swc',
+                url: 'models/single_cell_detailed.swc'
+            }
+        ],
+        enabled: false
     },
     {
-        title: 'Gap junctions',
-        url: 'models/gap_junctions.py',
-        description: 'Minimal example of multicompartmental cells connected via electrically conducting gap junctions and time delay synapses.',
-        enabled: true
-    },
-    {
-        title: 'Network ring',
+        title: 'Ring network',
         url: 'models/network_ring.py',
         description: 'Minimal example of a network in Arbor. Four cells connected with delayed synapses leads to a persistent traveling wave in the network.',
         enabled: true
     },
     {
-        title: 'Brunel',
+        title: 'Brunel network',
         url: 'models/brunel.py',
         description: 'Advanced network example. Sparsely connected excitatory and inhibitory LIF cells exhibit different synchronization states. Brunel, N. (2000). Dynamics of sparsely connected networks of excitatory and inhibitory spiking neurons. Journal of computational neuroscience, 8(3), 183-208.',
-        enabled: true
-    },
-    {
-        title: 'Plasticity',
-        url: 'models/plasticity.py',
-        description: 'Example of modifying synaptic connections in a running simulation. Thihs is done via the simulation.update_connections(recipe) function, which re-reads the recipe\'s connections_on().',
         enabled: true
     },
     {
@@ -48,16 +42,22 @@ const MODELS = [
         enabled: true
     },
     {
-        title: 'Single cell detailed recipe',
-        url: 'models/single_cell_detailed_recipe.py',
-        description: 'Advanced single cell example that loads the cell morphology from an external SWC file. This example is known to break on firefox.',
-        filesystem: [
-            {
-                path: 'single_cell_detailed.swc',
-                url: 'models/single_cell_detailed.swc'
-            }
-        ],
-        enabled: false
+        title: 'Gap junction network',
+        url: 'models/gap_junctions.py',
+        description: 'Minimal example of multicompartmental cells connected via electrically conducting gap junctions and time delay synapses.',
+        enabled: true
+    },
+    {
+        title: 'Ion diffusion',
+        url: 'models/diffusion.py',
+        description: 'Minimal example showcasing sodium diffusion through cell compartments.',
+        enabled: true
+    },
+    {
+        title: 'Modifying network topology',
+        url: 'models/plasticity.py',
+        description: 'Example of modifying synaptic connections in a running simulation. Thihs is done via the simulation.update_connections(recipe) function, which re-reads the recipe\'s connections_on().',
+        enabled: true
     },
 ]
 

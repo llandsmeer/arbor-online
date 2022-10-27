@@ -195,7 +195,7 @@ body {
 
 .loadable-model {
     margin: 12px;
-    padding: 12px;
+    padding: 0 12px;
     border: solid 1px #aaa;
     border-radius: 6px;
     cursor: pointer;
