@@ -102,7 +102,6 @@ function add_resize_handler() {
 
 async function main() {
     add_resize_handler();
-    return
     let editor = null
     let console_output = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
