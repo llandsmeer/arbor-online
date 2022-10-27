@@ -72,7 +72,7 @@ cable_mids = [(cable.prox + cable.dist)/2 for cable in m]
 
 # Plot
 fig = go.Figure(
-    data=[go.Line(x=cable_mids, y=tr[1:], name=f'{tr[0]:.3f}') for tr in d],
+    data=[go.Scatter(x=cable_mids, y=tr[1:], name=f'{tr[0]:.3f}') for tr in d],
     layout=go.Layout(
         title="Sodium diffusion",
         xaxis_title="Cable position (um)",
