@@ -59,14 +59,14 @@ sim.run(tfinal=10)
 
 # Table
 print("Sodium concentration (NaD/mM)")
-print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+print("|-" + "-+-".join("-" * 30 for _ in range(d.shape[1])) + "-|")
 print(
-    "| Time (ms)            | " + " | ".join(f"{str(l):<20}" for l in m) + " |"
+    "| Time (ms)                      | " + " | ".join(f"{str(l):<30}" for l in m) + " |"
 )
-print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+print("|-" + "-+-".join("-" * 30 for _ in range(d.shape[1])) + "-|")
 for ix in range(d.shape[0]):
-    print("| " + " | ".join(f"{v:>20.3f}" for v in d[ix, :]) + " |")
-print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+    print("| " + " | ".join(f"{v:>30.3f}" for v in d[ix, :]) + " |")
+print("|-" + "-+-".join("-" * 30 for _ in range(d.shape[1])) + "-|")
 
 cable_mids = [(cable.prox + cable.dist)/2 for cable in m]
 
