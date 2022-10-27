@@ -7,6 +7,7 @@ import arbor
 import pandas
 import sys
 from arbor import density
+from plotly.subplots import make_subplots
 import plotly.express as px
 import arbor_playground
 
@@ -136,7 +137,7 @@ meta = []
 for d, m in sim.samples(handle):
     data.append(d)
     meta.append(m)
-
+# Plot voltages
 df_list = []
 for i in range(len(data)):
     df_list.append(
@@ -150,6 +151,43 @@ for i in range(len(data)):
         )
     )
 df = pandas.concat(df_list, ignore_index=True)
-fig = px.line(df, x="t/ms", y="U/mV", color="Location")
+fig_trace = px.line(df, x="t/ms", y="U/mV", color="Location")
+
+# Plot morphology
+segments = [(branch, i, seg)
+                for branch in range(morph.num_branches)
+                for i, seg in enumerate(morph.branch_segments(branch))]
+seg_data = []
+for branch, i, segment in segments:
+    assert segment.prox.z == 0 # example neuron is 2d
+    name = f'branch{branch}/seg{i}'
+    seg_data.append(dict(
+        segment=name,
+        branch=branch,
+        x=segment.prox.x,
+        y=segment.prox.y
+        ))
+    # add midpoint for labels
+    seg_data.append(dict(
+        segment=name,
+        branch=branch,
+        x=(segment.prox.x+segment.dist.x)/2,
+        y=(segment.prox.y+segment.dist.y)/2
+        ))
+    seg_data.append(dict(
+        segment=name,
+        branch=branch,
+        x=segment.dist.x,
+        y=segment.dist.y
+        ))
+seg_data = pandas.DataFrame(seg_data)
+fig_morph = px.line(seg_data, x='x', y='y', color='branch', hover_name='segment')
+
+# Combine plots
+fig = make_subplots(rows=1, cols=2, subplot_titles=("Voltage Trace", "Morphology"))
+for trace in range(len(fig_trace["data"])):
+    fig.append_trace(fig_trace["data"][trace], row=1, col=1)
+for trace in range(len(fig_morph["data"])):
+    fig.append_trace(fig_morph["data"][trace], row=1, col=2)
 fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)
