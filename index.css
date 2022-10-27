@@ -129,7 +129,7 @@ body {
 
 @media (max-height: 500px) {
     .parent {
-        grid-template-rows: 25px 1fr 1fr 10px;
+        grid-template-rows: 25px 1fr 2fr 10px;
     }
 
     #brand {
