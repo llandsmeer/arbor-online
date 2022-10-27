@@ -75,7 +75,7 @@ class single_recipe(arbor.recipe):
         return self.the_props
 
 
-def run(dT, n_pairs=1, do_plots=False):
+def run(dT, n_pairs=1):
     recipe = single_recipe(dT, n_pairs)
 
     sim = arbor.simulation(recipe)
@@ -93,16 +93,6 @@ def run(dT, n_pairs=1, do_plots=False):
 
     sim.run(tfinal=600)
 
-    if do_plots:
-        print("Plotting detailed results ...")
-        for var, handle in handles.items():
-            data, meta = sim.samples(handle)[0]
-
-            df = pd.DataFrame({"t/ms": data[:, 0], var: data[:, 1]})
-            sns.relplot(data=df, kind="line", x="t/ms", y=var, ci=None).savefig(
-                f"single_cell_stdp_result_{var}.svg"
-            )
-
     weight_plastic, _ = sim.samples(handles["weight_plastic"])[0]
     return weight_plastic[:, 1][-1]
 
@@ -110,7 +100,7 @@ def run(dT, n_pairs=1, do_plots=False):
 data = np.array([(dT, run(dT)) for dT in np.arange(-20, 20, 0.5)])
 df = pd.DataFrame({"t/ms": data[:, 0], "dw": data[:, 1]})
 print("Plotting results ...")
-fig = px.line(df, x='t/ms', y='dw')
+fig = px.scatter(df, x='t/ms', y='dw')
 fig_html = fig.to_html(
     include_plotlyjs=False,
     full_html=False,

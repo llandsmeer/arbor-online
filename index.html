@@ -37,6 +37,32 @@
             <div class="modal-content">
                 <span class="modal-close">&times;</span>
                 <h2>Welcome to the Arbor Online Playground!</h2>
+                This is an
+                <a href="https://emscripten.org/">Emscripten</a>
+                +
+                <a href="https://pyodide.org/en/stable/"></a>
+                Pyodide port of the
+                <a href="https://arbor-sim.org/">Arbor Neural Simulator</a>.
+                This website is meant to be a simple showcase of
+                    neural modelling in Arbor.
+                If you want to do serious work with it,
+                    we recommend installing
+                        arbor-gui for a graphical interface to arbor
+                    or
+                        the library itself via pip or building from source.
+                While arbor is a stable robust simulator
+                    designed to run large scale simulation on
+                    thousands of CPU/GPU nodes, this port comes with some limitations.
+                Notable, only single CPU simulations are supported
+                    and custom mechanisms can not be loaded.
+                When requesting unavailable hardware resources or loading
+                    non existing morphology files,
+                    pyodide will internally crash which
+                    can only be resolved by refreshing the webpage.
+                Long running simulations will freeze the user interface.
+                The initial page load can take a minute.
+
+                Please report any issues on <a href="https://github.com/llandsmeer/arbor-online/issues">GitHub</a>.
 
                 <h3>Available example models</h3>
                 <div id="available-models"></div>

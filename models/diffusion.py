@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import arbor as A
-import plotly.express as px
+import plotly.graph_objs as go
 import arbor_playground
 
 class recipe(A.recipe):
@@ -38,8 +38,8 @@ _ = tree.append(s, A.mpoint(3, 0, 0, 1), A.mpoint(33, 0, 0, 1), tag=3)
 dec = A.decor()
 dec.set_ion("na", int_con=0.0, diff=0.005)
 dec.place("(location 0 0.5)", A.synapse("inject/x=na", {"alpha": 200.0}), "Zap")
-dec.paint("(all)", A.density("decay/x=na"))
-dec.discretization(A.cv_policy("(max-extent 5)"))
+dec.paint("(all)", A.density("decay/x=na", {'tau': 0.05}))
+dec.discretization(A.cv_policy("(max-extent 2)"))
 
 # Set up ion diffusion
 dec.set_ion("na", int_con=1.0, ext_con=140, rev_pot=50, diff=0.005)
@@ -51,27 +51,38 @@ prb = [
 cel = A.cable_cell(tree, dec)
 rec = recipe(cel, prb)
 sim = A.simulation(rec)
-hdl = (sim.sample((0, 0), A.regular_schedule(0.1)),)
+hdl = sim.sample((0, 0), A.regular_schedule(1))
 
-sim.run(tfinal=0.5)
+sim.run(tfinal=10)
 
-h = hdl[0]
-for d, m in sim.samples(h):
-    # Plot
-    fig = px.line(d)
-    fig_html = fig.to_html(
-        include_plotlyjs=False,
-        full_html=False,
-        default_height='100%'
+(d, m), = sim.samples(hdl)
+
+# Table
+print("Sodium concentration (NaD/mM)")
+print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+print(
+    "| Time (ms)            | " + " | ".join(f"{str(l):<20}" for l in m) + " |"
+)
+print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+for ix in range(d.shape[0]):
+    print("| " + " | ".join(f"{v:>20.3f}" for v in d[ix, :]) + " |")
+print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+
+cable_mids = [(cable.prox + cable.dist)/2 for cable in m]
+
+# Plot
+fig = go.Figure(
+    data=[go.Line(x=cable_mids, y=tr[1:], name=f'{tr[0]:.3f}') for tr in d],
+    layout=go.Layout(
+        title="Sodium diffusion",
+        xaxis_title="Cable position (um)",
+        yaxis_title="Sodium concentration (NaD/mM)",
+        legend_title="Time (ms)",
     )
-    arbor_playground.render_html(fig_html)
-    # Table
-    print("Sodium concentration (NaD/mM)")
-    print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
-    print(
-        "| Time (ms)            | " + " | ".join(f"{str(l):<20}" for l in m) + " |"
-    )
-    print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
-    for ix in range(d.shape[0]):
-        print("| " + " | ".join(f"{v:>20.3f}" for v in d[ix, :]) + " |")
-    print("|-" + "-+-".join("-" * 20 for _ in range(d.shape[1])) + "-|")
+)
+fig_html = fig.to_html(
+    include_plotlyjs=False,
+    full_html=False,
+    default_height='100%'
+)
+arbor_playground.render_html(fig_html)

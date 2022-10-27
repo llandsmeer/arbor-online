@@ -2,42 +2,62 @@ const MODELS = [
     {
         title: 'Single cell model',
         url: 'models/single_cell_model.py',
-        description: 'Single Hodgkin-Huxley cell'
+        description: 'Single Hodgkin-Huxley cell',
+        enabled: true
     },
     {
         title: 'Single cell recipe',
         url: 'models/single_cell_recipe.py',
-        description: 'Single Hodgkin-Huxley cell (via recipe)'
+        description: 'Single Hodgkin-Huxley cell (via recipe)',
+        enabled: true
     },
     {
         title: 'Diffusion',
         url: 'models/diffusion.py',
-        description: 'Minimal example showcasing sodium diffusion through cell compartments.'
+        description: 'Minimal example showcasing sodium diffusion through cell compartments.',
+        enabled: true
     },
     {
         title: 'Gap junctions',
         url: 'models/gap_junctions.py',
-        description: 'Minimal example of multicompartmental cells connected via gap junctions and synapses.'
+        description: 'Minimal example of multicompartmental cells connected via gap junctions and synapses.',
+        enabled: true
     },
     {
         title: 'Network ring',
         url: 'models/network_ring.py',
-        description: 'Minimal example of a network in Arbor. Four cells connected with delayed synapses leads to a persistent traveling wave in the network.'
+        description: 'Minimal example of a network in Arbor. Four cells connected with delayed synapses leads to a persistent traveling wave in the network.',
+        enabled: true
     },
     {
         title: 'Brunel',
         url: 'models/brunel.py',
-        description: 'Advanced network example containing excitatory and inhibitory LIF cells.'
+        description: 'Advanced network example. Sparsely connected excitatory and inhibitory LIF cells exhibit different synchronization states. Brunel, N. (2000). Dynamics of sparsely connected networks of excitatory and inhibitory spiking neurons. Journal of computational neuroscience, 8(3), 183-208.',
+        enabled: true
     },
     {
         title: 'Plasticity',
         url: 'models/plasticity.py',
-        description: 'TBH I don\'t understand how this demonstrates plasticity'
+        description: 'Example of modifying synaptic connections in a running simulation.',
+        enabled: true
     },
     {
         title: 'Spike-timing-dependent plasticity',
         url: 'models/single_cell_stdp.py',
-        description: 'STDP example using a single cell and explicit spike generators'
+        description: 'STDP example using a single cell and explicit spike generators',
+        enabled: true
+    },
+    {
+        title: 'single_cell_detailed_recipe.py',
+        url: 'models/single_cell_detailed_recipe.py',
+        description: 'SWC loading',
+        filesystem: [
+            {
+                path: 'single_cell_detailed_recipe.swc',
+                url: 'models/single_cell_detailed_recipe.swc'
+            }
+        ],
+        enabled: false
     },
 ]
 
@@ -84,6 +104,8 @@ async function main() {
     }
     let container = document.getElementById('available-models')
     MODELS.forEach((model, i) => {
+        const is_localhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        if (!is_localhost && !model.enabled) { return }
         container.innerHTML += `
             <div class="loadable-model" data-model-idx="${i}">
                 <h3>${quote(model.title)}</h3>
@@ -94,6 +116,16 @@ async function main() {
     async function load_model(model) {
         let res = await fetch(model.url)
         editor.session.setValue(await res.text())
+        if (model.filesystem) {
+            pyodide.FS.chdir('/home/pyodide')
+            for (const {path, url} of model.filesystem) {
+                message_ok('loading ' + path)
+                let r = await fetch(url)
+                let data = await r.text()
+                pyodide.FS.writeFile(path, data, { encoding: "utf8" });
+            }
+        }
+
         await run_code()
     }
     document.querySelectorAll('.loadable-model').forEach(target => {
