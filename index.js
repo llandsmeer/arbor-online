@@ -73,26 +73,32 @@ function add_resize_handler() {
     const grid_parent = document.getElementsByClassName('parent')[0]
     const hresize = document.getElementsByClassName('hresize')[0]
     let is_dragging = false
-    document.addEventListener('mousedown', function(e) {
+    let on_start = (e) => {
         if (e.target === hresize) {
             is_dragging = true
             e.preventDefault()
         }
-    });
-    document.addEventListener('mousemove', function(e) {
+    }
+    let on_move = (e) => {
         if (!is_dragging) return;
         let x = e.clientX
         let rect = grid_parent.getBoundingClientRect()
         let fraction = (x - rect.left) / (rect.width - 10);
-        fraction = Math.min(Math.max(.1, fraction), .9)
+        fraction = Math.min(Math.max(.05, fraction), .95)
         const total = 1000
         fraction = Math.round(fraction * total)
         grid_parent.style.gridTemplateColumns = `${fraction}fr 10px ${total - fraction}fr`
         e.preventDefault()
-    });
-    document.addEventListener('mouseup', function(e) {
+    }
+    let on_end = (e) => {
         is_dragging = false
-    });
+    }
+    document.addEventListener('mousedown', on_start);
+    document.addEventListener('mousemove', on_move);
+    document.addEventListener('mouseup', on_end)
+    document.addEventListener('touchstart', on_start);
+    document.addEventListener('touchmove', on_move);
+    document.addEventListener('touchend', on_end)
 }
 
 async function main() {
