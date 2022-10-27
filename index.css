@@ -80,11 +80,6 @@ body {
 }
 
 .parent {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: 60px repeat(2, 1fr) 10px;
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
     height: 100%;
 }
 
@@ -93,22 +88,31 @@ body {
 }
 
 .navbar {
-    grid-area: 1 / 1 / 2 / 3;
     background-color: #d86310;
-}
-.left {
-    grid-area: 2 / 1 / 4 / 2;
-}
-.rtop {
-    grid-area: 2 / 2 / 3 / 3;
-}
-.rbot {
-    grid-area: 3 / 2 / 4 / 3;
 }
 .footer {
-    grid-area: 4 / 1 / 5 / 3;
     background-color: #d86310;
 }
+
+.hresize {
+    cursor: col-resize;
+    background-color: #d86310;
+}
+
+/* https://cssgrid-generator.netlify.app/{*/
+.parent {
+    display: grid;
+    grid-template-columns: 1fr 10px 1fr;
+    grid-template-rows: 60px 1fr 1fr 10px;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+.navbar { grid-area: 1 / 1 / 2 / 4; }
+.left { grid-area: 2 / 1 / 4 / 2; }
+.rtop { grid-area: 2 / 3 / 3 / 4; }
+.rbot { grid-area: 3 / 3 / 4 / 4; }
+.footer { grid-area: 4 / 1 / 5 / 4; }
+.hresize { grid-area: 2 / 2 / 4 / 3; }
 
 .modal {
   display: none;
@@ -145,7 +149,7 @@ body {
   color: black;
   text-decoration: none;
   cursor: pointer;
-} 
+}
 
 #available-models {
     max-height: 500px;

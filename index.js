@@ -61,8 +61,33 @@ const MODELS = [
     },
 ]
 
+async function add_resize_handler() {
+    const grid_parent = document.getElementsByClassName('parent')[0]
+    const hresize = document.getElementsByClassName('hresize')[0]
+    let is_dragging = false
+    document.addEventListener('mousedown', function(e) {
+        if (e.target === hresize) {
+            is_dragging = true
+        }
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!is_dragging) return;
+        let x = e.clientX
+        let rect = grid_parent.getBoundingClientRect()
+        let fraction = (x - rect.left) / (rect.width - 10);
+        fraction = Math.min(Math.max(.1, fraction), .9)
+        const total = 100
+        fraction = Math.round(fraction * total)
+        grid_parent.style.gridTemplateColumns = `${fraction}fr 10px ${total - fraction}fr`
+    });
+    document.addEventListener('mouseup', function(e) {
+        is_dragging = false
+    });
+}
+
 async function main() {
-    let console = document.getElementById('console')
+    await add_resize_handler();
+    let console_output = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
     let welcome_btn = document.getElementById('welcome-btn')
     let current_modal = null
@@ -74,10 +99,10 @@ async function main() {
             .replaceAll("'", '&#039;');
     }
     function message_ok(msg) {
-        console.innerHTML += quote(msg) + '\n'
+        console_output.innerHTML += quote(msg) + '\n'
     }
     function message_err(msg) {
-        console.innerHTML += '<span class="error">' + quote(msg) + '</span>\n'
+        console_output.innerHTML += '<span class="error">' + quote(msg) + '</span>\n'
     }
     /* START MODAL CODE */
     document.querySelectorAll('.modal-close').forEach(e => {
@@ -196,7 +221,7 @@ async function main() {
 
     async function run_code(code=null) {
         if (code == null) {
-            console.innerText = ''
+            console_output.innerText = ''
             render_html_output('')
             run_btn.classList.remove("ready");
             message_ok('Console output [' + (new Date()).toISOString() + ']')
@@ -206,7 +231,7 @@ async function main() {
         } catch (error) {
             message_err(error)
         }
-        console.scrollTop = console.scrollHeight;
+        console_output.scrollTop = console_output.scrollHeight;
         if (code == null) {
             run_btn.classList.add("ready");
         }
