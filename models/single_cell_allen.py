@@ -3,6 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 import json
 import arbor
+import numpy as np
 import pandas
 import plotly.express as px
 import arbor_playground
@@ -121,7 +122,11 @@ cell, offset = make_cell("single_cell_allen.swc", "single_cell_allen_fit.json")
 model = arbor.single_cell_model(cell)
 
 # (13) Set the probe
-model.probe("voltage", '"midpoint"', frequency=200)
+# Recording frequency of neuron results is 200kHz,
+# which is done in the arbor github example as well.
+# However, in the browser environment, this really slows
+# down simulation, so we sample here at 10kHz.
+model.probe("voltage", '"midpoint"', frequency=10)
 
 # (14) Install the Allen mechanism catalogue.
 model.properties.catalogue.extend(arbor.allen_catalogue(), "")
@@ -135,10 +140,18 @@ simulation in the interactive environment.''', file=sys.stderr)
 model.run(tfinal=1400, dt=.5)
 
 # (16) Load and scale reference
-reference = (
-    1000.0 * pandas.read_csv("single_cell_allen_neuron_ref.csv")["U/mV"].values[:-1]
-    + offset
-)
+
+reference = pandas.read_csv("single_cell_allen_neuron_ref.csv", index_col=0)
+reference["U/mV"] = 1000 * reference["U/mV"] + offset
+reference["Simulator"] = "Neuron"
+# Plotting 280001 datapoints is slow in the browser, so subsample
+# This can be fairly coarse grained, except around spikes
+subsample = np.zeros(reference.shape[0], dtype=bool)
+subsample[::1000] = True
+nrn_spike_idxs = np.where(np.diff(np.sign(reference['U/mV'].values+40)))[0]
+for spike_idx in nrn_spike_idxs:
+    subsample[int(spike_idx-5000):int(spike_idx+5000):10] = True
+reference = reference.iloc[subsample]
 
 # (17) Plot
 df_list = []
@@ -151,17 +164,11 @@ df_list.append(
         }
     )
 )
-df_list.append(
-    pandas.DataFrame({
-        "t/ms": model.traces[0].time,
-        "U/mV": reference[:len(model.traces[0].time)],
-        "Simulator": "Neuron"
-    })
-)
+df_list.append(reference)
 df_list.append(
     pandas.DataFrame({
         "t/ms": [0,   200, 200, 1200, 1200, max(1250, max(model.traces[0].time))],
-        "U/mV": [-80, -80, -60,  -60,  -80,  -80],
+        "U/mV": [-110, -110, -100,  -100,  -110,  -110],
         "Simulator": "(Stimulus)"
     })
 )
@@ -171,6 +178,6 @@ fig = px.line(df, x="t/ms", y="U/mV", color="Simulator")
 fig_html = fig.to_html(include_plotlyjs=False, full_html=False)
 arbor_playground.render_html(fig_html)
 
-print('Spikes:')
+print('Arbor spikes:')
 for spike in model.spikes:
     print(f'    {spike:.2f}ms')
