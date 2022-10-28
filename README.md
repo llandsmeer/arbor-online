@@ -1,5 +1,7 @@
 # Arbor playground prebuilt
 
+<img src="example.png"></img>
+
 Versions
 
  - arbor 0.7.1-dev (491a0d648b8e245d04842f5ffed5ba9e3d087d48)
@@ -77,15 +79,3 @@ Generator: manual 1.0
 Root-Is-Purelib: false
 Tag: py3-none-any
 ```
-
-# Todo
-
- - Move python executin to worker thread to avoid freezing the main
- - Fix some ugly modal behaviour (mostly related to scrolling)
- - UI design improvements
- - Add license and notes regarding to limitations
- - Investigate morphology loading
- - Reload pyodide on error (eg specifiying a thread count > 1) 
- - Clear environment between runs
- - Add more examples
- - Add example descriptions
