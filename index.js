@@ -24,6 +24,26 @@ const MODELS = [
         enabled: true
     },
     {
+        title: 'Single cell Allen',
+        url: 'models/single_cell_allen.py',
+        description: 'Multicompartmental cell comparison between NEURON and Arbor. Quite slow to run.',
+        filesystem: [
+            {
+                path: 'single_cell_allen_fit.json',
+                url: 'models/single_cell_allen_fit.json'
+            },
+            {
+                path: 'single_cell_allen.swc',
+                url: 'models/single_cell_allen.swc'
+            },
+            {
+                path: 'single_cell_allen_neuron_ref.csv',
+                url: 'https://raw.githubusercontent.com/arbor-sim/arbor/master/python/example/single_cell_allen_neuron_ref.csv'
+            }
+        ],
+        enabled: false
+    },
+    {
         title: 'Ring network',
         url: 'models/network_ring.py',
         description: 'Minimal example of a network in Arbor. Four cells connected with delayed synapses leads to a persistent traveling wave in the network.',
@@ -140,10 +160,16 @@ async function main() {
     MODELS.forEach((model, i) => {
         // const is_localhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
         // if (!is_localhost && !model.enabled) { return }
+        let possible_file_list = ''
+        if (model.filesystem) {
+            let lis = model.filesystem.map(({path}) => `<code>${quote(path)}</code>`).join(', ')
+            possible_file_list = `<p>Extra: ${lis}</p>`
+        }
         container.innerHTML += `
             <div class="loadable-model" data-model-idx="${i}">
                 <h3>${quote(model.title)}</h3>
                 <p>${quote(model.description)}</p>
+                ${possible_file_list}
             </div>
         `
     })
