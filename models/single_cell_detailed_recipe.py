@@ -1,8 +1,3 @@
-# WARNING!!
-# This script breaks with an pyodide internal
-# error in firefox, runs fine in chrome
-# Therefore it doesn't automatically run on startup
-
 import arbor
 import pandas
 import sys
@@ -12,6 +7,8 @@ import plotly.express as px
 import arbor_playground
 
 # (1) Read the morphology from an SWC file.
+
+# WARNING! Loading a non-existing file will crash pyodide
 
 filename = 'single_cell_detailed.swc'
 morph = arbor.load_swc_arbor(filename)

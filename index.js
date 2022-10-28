@@ -21,7 +21,7 @@ const MODELS = [
                 url: 'models/single_cell_detailed.swc'
             }
         ],
-        enabled: false
+        enabled: true
     },
     {
         title: 'Ring network',
