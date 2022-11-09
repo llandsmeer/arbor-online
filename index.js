@@ -154,7 +154,6 @@ async function main() {
             current_modal.style.display = 'none';
         }
     }
-    show_modal('welcome-modal')
     welcome_btn.onclick = () => {
         show_modal('welcome-modal')
     }
@@ -177,6 +176,7 @@ async function main() {
     })
     async function load_model(model) {
         if (editor == null) return
+        loader_icon.classList.add('loading')
         console_output.innerText = ''
         render_html_output('')
         let res = await fetch(model.url)
@@ -196,6 +196,7 @@ async function main() {
         } else {
             message_ok('Note: script not automatically executed')
         }
+        loader_icon.classList.remove('loading')
     }
     document.querySelectorAll('.loadable-model').forEach(target => {
         target.onclick = async () => {
@@ -321,7 +322,7 @@ async function main() {
     loader_icon.classList.remove('loading')
     run_btn.classList.add("ready");
 
-
+    show_modal('welcome-modal')
 };
 
 main();
