@@ -11,7 +11,9 @@ Versions
 
 
 
-Live version (v0.1 beta): https://llandsmeer.github.io/arbor-online/
+Live version (v0.2 beta): https://llandsmeer.github.io/arbor-online/
+
+Custom mechanisms go in the catalogue directory
 
 
 ## Build instructions

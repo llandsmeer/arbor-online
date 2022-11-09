@@ -56,6 +56,18 @@ const MODELS = [
         enabled: true
     },
     {
+        title: 'Inferior Olive (Single Cell)',
+        url: 'models/io_single_cell.py',
+        description: 'Inferior Olive neuron model due to Smol et al. Uses a custom catalogue generated from NeuroML source using NMLCC.',
+        enabled: true,
+        filesystem: [
+            {
+                path: 'io-catalogue.so',
+                url: 'catalogue/io-catalogue.so'
+            }
+        ],
+    },
+    {
         title: 'Spike-timing-dependent plasticity',
         url: 'models/single_cell_stdp.py',
         description: 'STDP example using a single cell and explicit spike generators. Plots out weight change as a function of simulus distance over multiple simulations.',
@@ -211,8 +223,9 @@ async function main() {
             pyodide.FS.chdir('/home/pyodide')
             for (const {path, url} of model.filesystem) {
                 let r = await fetch(url)
-                let data = await r.text()
-                pyodide.FS.writeFile(path, data, { encoding: "utf8" });
+                let data = await r.blob() // text() fails for .so files
+                console.log()
+                pyodide.FS.writeFile(path, new Uint8Array(await data.arrayBuffer()));
                 message_ok('Created file "' + path + '"')
             }
         }
