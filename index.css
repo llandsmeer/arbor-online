@@ -204,3 +204,25 @@ body {
 .loadable-model:hover {
     background-color: #eee;
 }
+
+@keyframes rotating {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#loader-icon {
+    display: none;
+}
+
+#loader-icon.loading {
+    z-index: 1000;
+    display: block;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 30mm;
+    height: 30mm;
+    margin-left: -15mm;
+    margin-top: -15mm;
+    animation: rotating 3s linear infinite;
+}

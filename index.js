@@ -123,10 +123,12 @@ function add_resize_handler() {
 async function main() {
     add_resize_handler();
     let editor = null
+    let loader_icon = document.getElementById('loader-icon')
     let console_output = document.getElementById('console')
     let run_btn = document.getElementById('run-btn')
     let welcome_btn = document.getElementById('welcome-btn')
     let current_modal = null
+    loader_icon.classList.add('loading')
     function message_ok(msg) {
         console_output.innerHTML += quote(msg) + '\n'
     }
@@ -316,6 +318,7 @@ async function main() {
 
     await load_model(MODELS[0])
 
+    loader_icon.classList.remove('loading')
     run_btn.classList.add("ready");
 
 
