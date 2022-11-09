@@ -112,24 +112,34 @@ body {
     background-color: #d86310;
 }
 
+.vresize {
+    cursor: row-resize;
+    background-color: #d86310;
+}
+
 /* https://cssgrid-generator.netlify.app/{*/
 .parent {
     display: grid;
+    /* WARNING!!! NEED TO KEEP THESE IN SYNC WITH on_resize_handler on_move */
     grid-template-columns: 1fr 10px 1fr;
-    grid-template-rows: 60px 1fr 1fr 10px;
+    grid-template-rows: 60px 1fr 10px 1fr 10px;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
 }
-.navbar { grid-area: 1 / 1 / 2 / 4; }
-.left { grid-area: 2 / 1 / 4 / 2; }
-.rtop { grid-area: 2 / 3 / 3 / 4; }
-.rbot { grid-area: 3 / 3 / 4 / 4; }
-.footer { grid-area: 4 / 1 / 5 / 4; }
-.hresize { grid-area: 2 / 2 / 4 / 3; }
 
+.navbar { grid-area: 1 / 1 / 2 / 4; }
+.left { grid-area: 2 / 1 / 5 / 2; }
+.rtop { grid-area: 2 / 3 / 3 / 4; }
+.rbot { grid-area: 4 / 3 / 5 / 4; }
+.footer { grid-area: 5 / 1 / 6 / 4; }
+.hresize { grid-area: 2 / 2 / 5 / 3; }
+.vresize { grid-area: 3 / 3 / 4 / 4; } 
+
+/*
+ this collides with .vresize
 @media (max-height: 500px) {
     .parent {
-        grid-template-rows: 25px 1fr 2fr 10px;
+        grid-template-rows: 25px 1fr 10px 1fr 10px;
     }
 
     #brand {
@@ -149,6 +159,7 @@ body {
         font-size: 16px;
     }
 }
+*/
 
 .modal {
   display: none;

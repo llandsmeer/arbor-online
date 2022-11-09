@@ -91,26 +91,52 @@ function quote(text) {
 
 function add_resize_handler() {
     const grid_parent = document.getElementsByClassName('parent')[0]
-    let is_dragging = false
+    const DRAG_NONE = 0,
+          DRAG_HOR = 1,
+          DRAG_VER = 2;
+    let drag_state = DRAG_NONE;
     let on_start = (e) => {
         if (e.target.className === 'hresize') {
-            is_dragging = true
+            drag_state = DRAG_HOR
+            e.preventDefault()
+        }
+        if (e.target.className === 'vresize') {
+            drag_state = DRAG_VER
             e.preventDefault()
         }
     }
+    function get_total_px(gridspec) {
+        let total = 0
+        for (let m of gridspec.matchAll(/([0-9]+)px/g)) {
+            total += parseInt(m[1])
+        }
+        return total
+    }
     let on_move = (e) => {
-        if (!is_dragging) return;
-        let x = e.changedTouches === undefined ? e.clientX : e.changedTouches[0].clientX
-        let rect = grid_parent.getBoundingClientRect()
-        let fraction = (x - rect.left) / (rect.width - 10);
-        fraction = Math.min(Math.max(.05, fraction), .95)
-        const total = 1000
-        fraction = Math.round(fraction * total)
-        grid_parent.style.gridTemplateColumns = `${fraction}fr 10px ${total - fraction}fr`
-        e.preventDefault()
+        if (drag_state == DRAG_HOR) {
+            let x = e.changedTouches === undefined ? e.clientX : e.changedTouches[0].clientX
+            let rect = grid_parent.getBoundingClientRect()
+            let fraction = (x - rect.left) / (rect.width - get_total_px(grid_parent.style.gridTemplateColumns));
+            fraction = Math.min(Math.max(.05, fraction), .95)
+            const total = 1000
+            fraction = Math.round(fraction * total)
+            grid_parent.style.gridTemplateColumns = `${fraction}fr 10px ${total - fraction}fr` // <-- keep in sync with css
+            e.preventDefault()
+        }
+        if (drag_state == DRAG_VER) {
+            let y = e.changedTouches === undefined ? e.clientY : e.changedTouches[0].clientY
+            let rect = grid_parent.getBoundingClientRect()
+            let fraction = (y - rect.top - 60) / (rect.height - get_total_px(grid_parent.style.gridTemplateRows));
+            fraction = Math.min(Math.max(.05, fraction), .95)
+            const total = 1000
+            fraction = Math.round(fraction * total)
+            console.log(fraction)
+            grid_parent.style.gridTemplateRows = `60px ${fraction}fr 10px ${total - fraction}fr 10px` // <-- keep in sync with css
+            e.preventDefault()
+        }
     }
     let on_end = (e) => {
-        is_dragging = false
+        drag_state = DRAG_NONE
     }
     document.addEventListener('mousedown', on_start);
     document.addEventListener('mousemove', on_move);
