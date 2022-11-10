@@ -24,6 +24,7 @@ do
     mkdir "$TMP"
     mkdir "$GEN"
 
+    echo "${CATNAME}"/*.mod
     ${MODCC} -N arb -c "${CATNAME}" -o "${GEN}" -t cpu "${CATNAME}"/*.mod
 
     em++ "${GEN}"/*.cpp \

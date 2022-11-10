@@ -1,5 +1,23 @@
 const MODELS = [
+{ title: 'Example models:', is_header: true, },
     {
+        title: 'Brunel network',
+        url: 'models/brunel.py',
+        description: 'Advanced network example. Sparsely connected excitatory and inhibitory LIF cells exhibit different synchronization states. Brunel, N. (2000). Dynamics of sparsely connected networks of excitatory and inhibitory spiking neurons. Journal of computational neuroscience, 8(3), 183-208.',
+        enabled: true
+    },
+    {
+        title: 'Cluster synchronization in the Inferior Olive',
+        url: 'models/io_network.py',
+        description: 'Inferior Olive neuron model due to Smol et al. Uses a custom catalogue generated from NeuroML source using NMLCC. Network version.',
+        enabled: true,
+        filesystem: [
+            { path: 'io-catalogue.so', url: 'catalogue/io-catalogue.so' }
+        ],
+    },
+{ title: 'Arbor usage examples:', is_header: true, },
+    {
+        load_first: true,
         title: 'Single Hodgkin-Huxley cell (single_cell_model)',
         url: 'models/single_cell_model.py',
         description: 'The smallest possible useful Arbor example. A single Hodgkin-Huxley cell constructed via the simple arbor.single_cell_model API. The single_cell_model is not as powerful a full recipe construction, but is very convenient for if you\'re only simulating a single cell and only interested in recording voltages.',
@@ -12,60 +30,39 @@ const MODELS = [
         enabled: true
     },
     {
-        title: 'Single cell detailed recipe (SWC morphology)',
-        url: 'models/single_cell_detailed_recipe.py',
-        description: 'Advanced single cell example that loads the cell morphology from an external SWC file. Sodium concentration reversal potential is calculated using the Nernst equations. This example is known to break on firefox.',
-        filesystem: [
-            {
-                path: 'single_cell_detailed.swc',
-                url: 'models/single_cell_detailed.swc'
-            }
-        ],
-        enabled: true
-    },
-    {
         title: 'Single cell Allen',
         url: 'models/single_cell_allen.py',
         description: 'Multicompartmental cell comparison between NEURON and Arbor. Quite slow to run.',
         filesystem: [
-            {
-                path: 'single_cell_allen_fit.json',
-                url: 'models/single_cell_allen_fit.json'
-            },
-            {
-                path: 'single_cell_allen.swc',
-                url: 'models/single_cell_allen.swc'
-            },
-            {
-                path: 'single_cell_allen_neuron_ref.csv',
-                url: 'https://raw.githubusercontent.com/arbor-sim/arbor/master/python/example/single_cell_allen_neuron_ref.csv'
-            }
+            { path: 'single_cell_allen_fit.json', url: 'models/single_cell_allen_fit.json' },
+            { path: 'single_cell_allen.swc', url: 'models/single_cell_allen.swc' },
+            { path: 'single_cell_allen_neuron_ref.csv', url: 'https://raw.githubusercontent.com/arbor-sim/arbor/master/python/example/single_cell_allen_neuron_ref.csv' }
         ],
         enabled: false
+    },
+    {
+        title: 'Single cell detailed recipe (SWC morphology)',
+        url: 'models/single_cell_detailed_recipe.py',
+        description: 'Advanced single cell example that loads the cell morphology from an external SWC file. Sodium concentration reversal potential is calculated using the Nernst equations. This example is known to break on firefox.',
+        filesystem: [
+            { path: 'single_cell_detailed.swc', url: 'models/single_cell_detailed.swc' }
+        ],
+        enabled: true
+    },
+    {
+        title: 'Single Inferior Olive Neuron (custom mechanisms)',
+        url: 'models/io_single_cell.py',
+        description: 'Inferior Olive neuron model due to Smol et al. Uses a custom catalogue generated from NeuroML source using NMLCC.',
+        enabled: true,
+        filesystem: [
+            { path: 'io-catalogue.so', url: 'catalogue/io-catalogue.so' }
+        ],
     },
     {
         title: 'Ring network',
         url: 'models/network_ring.py',
         description: 'Minimal example of a network in Arbor. Four cells connected with delayed synapses leads to a persistent traveling wave in the network.',
         enabled: true
-    },
-    {
-        title: 'Brunel network',
-        url: 'models/brunel.py',
-        description: 'Advanced network example. Sparsely connected excitatory and inhibitory LIF cells exhibit different synchronization states. Brunel, N. (2000). Dynamics of sparsely connected networks of excitatory and inhibitory spiking neurons. Journal of computational neuroscience, 8(3), 183-208.',
-        enabled: true
-    },
-    {
-        title: 'Inferior Olive (Single Cell)',
-        url: 'models/io_single_cell.py',
-        description: 'Inferior Olive neuron model due to Smol et al. Uses a custom catalogue generated from NeuroML source using NMLCC.',
-        enabled: true,
-        filesystem: [
-            {
-                path: 'io-catalogue.so',
-                url: 'catalogue/io-catalogue.so'
-            }
-        ],
     },
     {
         title: 'Spike-timing-dependent plasticity',
@@ -199,18 +196,24 @@ async function main() {
     MODELS.forEach((model, i) => {
         // const is_localhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
         // if (!is_localhost && !model.enabled) { return }
-        let possible_file_list = ''
-        if (model.filesystem) {
-            let lis = model.filesystem.map(({path}) => `<code>${quote(path)}</code>`).join(', ')
-            possible_file_list = `<p>Extra: ${lis}</p>`
+        if (model.is_header) {
+            container.innerHTML += `
+                <h3 class="loadable-models-header">${quote(model.title)}</h3>
+            `
+        } else {
+            let possible_file_list = ''
+            if (model.filesystem) {
+                let lis = model.filesystem.map(({path}) => `<code>${quote(path)}</code>`).join(', ')
+                possible_file_list = `<p>Extra: ${lis}</p>`
+            }
+            container.innerHTML += `
+                <div class="loadable-model" data-model-idx="${i}">
+                    <h3>${quote(model.title)}</h3>
+                    <p>${quote(model.description)}</p>
+                    ${possible_file_list}
+                </div>
+            `
         }
-        container.innerHTML += `
-            <div class="loadable-model" data-model-idx="${i}">
-                <h3>${quote(model.title)}</h3>
-                <p>${quote(model.description)}</p>
-                ${possible_file_list}
-            </div>
-        `
     })
     async function load_model(model) {
         if (editor == null) return
@@ -356,7 +359,7 @@ async function main() {
         await run_code();
     }
 
-    await load_model(MODELS[0])
+    await load_model(MODELS.find(m => m.load_first))
 
     loader_icon.classList.remove('loading')
     run_btn.classList.add("ready");

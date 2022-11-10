@@ -18,7 +18,6 @@ labels = arbor.label_dict({
 })
 decor = (
     arbor.decor()
-    .set_property(Vm=-40)
     .paint('"soma"', arbor.density("hh"))
     .paint('"soma"', arbor.density('na_s', dict(conductance=0.030)))
     .paint('"soma"', arbor.density('kdr',  dict(conductance=0.030, ek=-75)))
